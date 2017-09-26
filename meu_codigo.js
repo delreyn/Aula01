@@ -22,6 +22,17 @@ var corRacket;
 var racketLargur = 100;
 var racketAltur = 10;
 
+//Paredes
+
+var velParede = 5;
+var inteParede = 1000;
+var ultTemp = 0;
+var altBrecMin = 200;
+var altBrecMax = 300;
+var lagParede = 80;
+var corParede;
+var paredes = [];
+
 /********* BLOCO SETUP  *********/
 
 function setup() {
@@ -35,6 +46,7 @@ function setup() {
 
   corBol = color(0);
   corRacket = color(0);
+  corParede = color(44, 62, 80);
 }
 
 
@@ -70,7 +82,9 @@ function gameplayScreen() {
   aplGravidade();
   manterEmTela();
   aplVelHoriz();
-  quicaRacket();
+  verQuicaRacket();
+  paredeHandler();
+  maisParede();
 }
 function gameOverScreen() {
   background(44, 62, 80);
@@ -113,7 +127,7 @@ function restart() {
   saude = saudeMax;
   bolX=width/4;
   bolY=height/5;
-  lastAddTime = 0;
+  ultTemp = 0;
   paredes = [];
   gameScreen = 1;
 }
@@ -131,13 +145,65 @@ function desRacket() {
   rect(mouseX, mouseY, racketLargur, racketAltur, 5);
 }
 
-function quicaRacket() {
+function maisParede() {
+  if (millis()- ultTemp > inteParede) {
+    var randAltu = round(random(altBrecMin, altBrecMax));
+    var randY = round(random(0, height-randHeight));
+    // {gapparedeX, gapparedeY, gapparedeLargura, gapparedeAltura, pontos}
+    var randparede = [width, randY, lagParede, randAltu, 0]; 
+    paredes.push(randparede);
+    ultTemp = millis();
+  }
+}
+function paredeHandler() {
+  for (var i = 0; i < paredes.length; i++) {
+    paredeRemover(i);
+    paredeMover(i);
+    desParede(i);
+   // paredeCollision(i);
+  }
+}
+function desParede(index) {
+  var parede = paredes[index];
+  // pega os valores de brecha de parede 
+  var brecParedeX = parede[0];
+  var brecParedeY = parede[1];
+  var brecParedeLargura = parede[2];
+  var brecParedeAltura = parede[3];
+  // dsenha paredes
+  rectMode(CORNER);
+  noStroke();
+  strokeCap(ROUND);
+  fill(corParede);
+  rect(brecParedeX, 0, brecParedeLargura, brecParedeY, 0, 0, 15, 15);
+  rect(brecParedeX, brecParedeY+brecParedeAltura, brecParedeLargura, height-(brecParedeY+brecParedeAltura), 15, 15, 0, 0);
+}
+function paredeMover(index) {
+  var parede = paredes[index];
+  parede[0] -= velParede;
+}
+function paredeRemover(index) {
+  var parede = paredes[index];
+  if (parede[0]+parede[2] <= 0) {
+    paredes.splice(index, 1);
+  }
+}
+
+function paredeRemover(index) {
+  var parede = paredes[index];
+  if (parede[0]+parede[2] <= 0) {
+    paredes.splice(index, 1);
+  }
+}
+
+
+function verQuicaRacket() {
   var emcima = mouseY - pmouseY;
   if ((bolX+(tamBol/2) > mouseX-(racketLargur/2)) && (bolX-(tamBol/2) < mouseX+(racketLargur/2))) {
     if (dist(bolX, bolY, bolX, mouseY)<=(tamBol/2)+abs(emcima)) {
       fazerQuicarChao(mouseY);
       horizBolVel = (bolX - mouseX)/10;
-      // racket moving up
+      // racket se movendo para cima
       if (emcima<0) {
         bolY+=(emcima/2);
         vertBolVel+=(emcima/2);
