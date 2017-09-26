@@ -147,10 +147,10 @@ function desRacket() {
 
 function maisParede() {
   if (millis()- ultTemp > inteParede) {
-    var randAltu = round(random(altBrecMin, altBrecMax));
+    var randHeight = round(random(altBrecMin, altBrecMax));
     var randY = round(random(0, height-randHeight));
-    // {gapparedeX, gapparedeY, gapparedeLargura, gapparedeAltura, pontos}
-    var randparede = [width, randY, lagParede, randAltu, 0]; 
+    // {gapparedeX, gapparedeY, gapparedeLargura, gapparedeAltura, scored}
+    var randparede = [width, randY, lagParede, randHeight, 0]; 
     paredes.push(randparede);
     ultTemp = millis();
   }
@@ -160,7 +160,7 @@ function paredeHandler() {
     paredeRemover(i);
     paredeMover(i);
     desParede(i);
-   // paredeCollision(i);
+   // watchparedeCollision(i);
   }
 }
 function desParede(index) {
