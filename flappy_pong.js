@@ -17,6 +17,13 @@ var tamBol = 20;
 var vertBolVel = 0;
 var horizBolVel = 0;
 
+// Pontos e vida (etapa 4)
+var pontos = 0;
+var saudeMax = 100;
+var saude = 100;
+var saudeMenos = 1;
+var barraSaudeLarg = 60;
+
 // racket settings
 var corRacket;
 var racketLargur = 100;
@@ -25,10 +32,10 @@ var racketAltur = 10;
 //Paredes
 
 var velParede = 5;
-var inteParede = 1000;
+var inteParede = 1000; //Intevalo entre paredes
 var ultTemp = 0;
-var altBrecMin = 200;
-var altBrecMax = 300;
+var altMin = 200;
+var altMax = 300;
 var lagParede = 80;
 var corParede;
 var paredes = [];
@@ -81,10 +88,13 @@ function gameplayScreen() {
   desRacket();
   aplGravidade();
   manterEmTela();
+  desBarraSaud();
+  mostraPonto();
   aplVelHoriz();
   verQuicaRacket();
-  paredeHandler();
   maisParede();
+  paredeHandler();
+  
 }
 function gameOverScreen() {
   background(44, 62, 80);
@@ -147,9 +157,9 @@ function desRacket() {
 
 function maisParede() {
   if (millis()- ultTemp > inteParede) {
-    var randHeight = round(random(altBrecMin, altBrecMax));
+    var randHeight = round(random(altMin, altMax));
     var randY = round(random(0, height-randHeight));
-    // {gapparedeX, gapparedeY, gapparedeLargura, gapparedeAltura, scored}
+    // {gapparedeX, gapparedeY, gapparedeLargura, gapparedeAltura, pontos}
     var randparede = [width, randY, lagParede, randHeight, 0]; 
     paredes.push(randparede);
     ultTemp = millis();
@@ -160,23 +170,24 @@ function paredeHandler() {
     paredeRemover(i);
     paredeMover(i);
     desParede(i);
-   // watchparedeCollision(i);
+    colisao(i);
+   
   }
 }
 function desParede(index) {
   var parede = paredes[index];
-  // pega os valores de brecha de parede 
-  var brecParedeX = parede[0];
-  var brecParedeY = parede[1];
-  var brecParedeLargura = parede[2];
-  var brecParedeAltura = parede[3];
+  // pega os valores da parede 
+  var paredeX = parede[0];
+  var paredeY = parede[1];
+  var paredeLargura = parede[2];
+  var gapParedeAltura = parede[3];
   // dsenha paredes
   rectMode(CORNER);
   noStroke();
   strokeCap(ROUND);
   fill(corParede);
-  rect(brecParedeX, 0, brecParedeLargura, brecParedeY, 0, 0, 15, 15);
-  rect(brecParedeX, brecParedeY+brecParedeAltura, brecParedeLargura, height-(brecParedeY+brecParedeAltura), 15, 15, 0, 0);
+  rect(paredeX, 0, paredeLargura, paredeY, 0, 0, 15, 15);
+  rect(paredeX, paredeY+gapParedeAltura, paredeLargura, height-(paredeY+gapParedeAltura), 15, 15, 0, 0);
 }
 function paredeMover(index) {
   var parede = paredes[index];
@@ -194,6 +205,82 @@ function paredeRemover(index) {
   if (parede[0]+parede[2] <= 0) {
     paredes.splice(index, 1);
   }
+}
+
+//Colisao
+
+function colisao(index) {
+  var parede = paredes[index];
+  // get gap parede settings 
+  var gapParedeX = parede[0];
+  var gapParedeY = parede[1];
+  var gapParedeLargura = parede[2];
+  var gapParedeAltura = parede[3];
+  var paredePontos = parede[4];
+  var paredeTopX = gapParedeX;
+  var paredeTopY = 0;
+  var paredeTopWidth = gapParedeLargura;
+  var paredeTopHeight = gapParedeX;
+  var paredeBottomX = gapParedeX;
+  var paredeBottomY = gapParedeX+gapParedeAltura;
+  var paredeBottomWidth = gapParedeLargura;
+  var paredeBottomHeight = height-(gapParedeY+gapParedeAltura);
+
+  if (
+    ( bolX+(tamBol/2)>paredeTopX) &&
+    ( bolX-(tamBol/2)<paredeTopX+paredeTopWidth) &&
+    ( bolY+(tamBol/2)>paredeTopY) &&
+    ( bolY-(tamBol/2)<paredeTopY+paredeTopHeight)
+    ) {
+    menosSaud();
+  }
+  if (
+    ( bolX+( tamBol/2)>paredeBottomX) &&
+    ( bolX-( tamBol/2)<paredeBottomX+paredeBottomWidth) &&
+    ( bolY+( tamBol/2)>paredeBottomY) &&
+    ( bolY-( tamBol/2)<paredeBottomY+paredeBottomHeight)
+    ) {
+    menosSaud();
+  }
+
+  if ( bolX > gapParedeX+(gapParedeLargura/2) && paredePontos==0) {
+    paredePontos=1;
+    parede[4]=1; // impedir q seja marcado pontos + de 1 vez
+    maisPonto();
+  }
+}
+
+function desBarraSaud() {
+  noStroke();
+  fill(189, 195, 199);
+  rectMode(CORNER);
+  rect(bolX-(barraSaudeLarg/2), bolY - 30, barraSaudeLarg, 5);
+  if (saude > 60) {
+    fill(46, 204, 113);
+  } else if (saude > 30) {
+    fill(230, 126, 34);
+  } else {
+    fill(231, 76, 60);
+  }
+  rectMode(CORNER);
+  rect(bolX-(barraSaudeLarg/2), bolY - 30, barraSaudeLarg*(saude/saudeMax), 5);
+}
+
+function menosSaud() {
+  saude -= saudeMenos;
+  if (saude <= 0) {
+    gameOver();
+  }
+}
+
+function maisPonto() {
+  pontos++;
+}
+function mostraPonto() {
+  textAlign(CENTER);
+  fill(0);
+  textSize(30); 
+  text(pontos, height/2, 50);
 }
 
 
