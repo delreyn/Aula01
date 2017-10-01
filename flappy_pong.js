@@ -31,7 +31,7 @@ var racketAltur = 10;
 
 //Paredes
 
-var velParede = 5;
+var velParede = 4;
 var inteParede = 1000; //Intevalo entre paredes
 var ultTemp = 0;
 var altMin = 200;
@@ -39,6 +39,11 @@ var altMax = 300;
 var lagParede = 80;
 var corParede;
 var paredes = []; 
+
+//objetos
+
+//intObj = 25000;
+var jaFoi = [0,0,0,0];
 
 /********* BLOCO SETUP  *********/
 
@@ -94,6 +99,7 @@ function gameplayScreen() {
   verQuicaRacket();
   maisParede();
   paredeHandler();
+  novoNivel();
   
 }
 function gameOverScreen() {
@@ -140,6 +146,9 @@ function restart() {
   ultTemp = 0;
   paredes = [];
   gameScreen = 1;
+  corParede = color(44, 62, 80);
+  velParede = 4;
+  
 }
 
 //Desenha a bola
@@ -206,6 +215,7 @@ function paredeRemover(index) {
 }
 
 //Colisao
+
 function colisao(index) {
   var parede = paredes[index];
   // Carrega as definições de parede   
@@ -246,7 +256,48 @@ function colisao(index) {
     maisPonto();
   }
 } 
+/* 
+ function watchWallCollision(index) {
+  var parede = paredes[index];
+  // get gap wall settings 
+  var gapWallX = parede[0];
+  var gapWallY = parede[1];
+  var gapWallWidth = parede[2];
+  var gapWallHeight = parede[3];
+  var wallScored = parede[4];
+  var wallTopX = gapWallX;
+  var wallTopY = 0;
+  var wallTopWidth = gapWallWidth;
+  var wallTopHeight = gapWallY;
+  var wallBottomX = gapWallX;
+  var wallBottomY = gapWallY+gapWallHeight;
+  var wallBottomWidth = gapWallWidth;
+  var wallBottomHeight = height-(gapWallY+gapWallHeight);
 
+  if (
+    (bolX+(tamBol/2)>wallTopX) &&
+    (bolX-(tamBol/2)<wallTopX+wallTopWidth) &&
+    (bolY+(tamBol/2)>wallTopY) &&
+    (bolY-(tamBol/2)<wallTopY+wallTopHeight)
+    ) {
+    menosSaud();
+  }
+  if (
+    (bolX+(tamBol/2)>wallBottomX) &&
+    (bolX-(tamBol/2)<wallBottomX+wallBottomWidth) &&
+    (bolY+(tamBol/2)>wallBottomY) &&
+    (bolY-(tamBol/2)<wallBottomY+wallBottomHeight)
+    ) {
+    menosSaud();
+  } 
+
+  if (bolX > gapWallX+(gapWallWidth/2) && wallScored==0) {
+    wallScored=1;
+    parede[4]=1;
+    maisPonto();
+  }
+} 
+*/
 function desBarraSaud() {
   noStroke();
   fill(189, 195, 199);
@@ -264,7 +315,7 @@ function desBarraSaud() {
 }
 
 function menosSaud() {
-  saude -= saudeMenos;
+  //saude -= saudeMenos;
   if (saude <= 0) {
     gameOver();
   }
@@ -296,6 +347,33 @@ function verQuicaRacket() {
   }
 }
 
+function novoNivel() {
+	if (pontos > 10 && pontos < 20 && jaFoi[0]==0){
+	corParede = color(6, 189, 24);
+	velParede++;
+	//saude += 50;
+	jaFoi[0]=1;
+	}
+	if ( pontos > 20 && pontos < 30 && jaFoi[1]==0){
+	corParede = color(227, 5, 142);
+	velParede++;
+	//saude += 50;
+	jaFoi[1]=1;
+	}
+	if ( pontos > 30 && pontos < 40 && jaFoi[2]==0){
+	corParede = color(207, 230, 0);
+	velParede++;
+	//saude += 50;
+	jaFoi[2]=1;
+	}
+	if ( pontos > 40 && pontos < 50 && jaFoi[3]==0){
+	corParede = color(237, 0, 4);
+	velParede++;
+	//saude += 50;
+	jaFoi[3]=1;
+	}
+	
+}
 
 //Aplica gravidade
 function aplGravidade() {
