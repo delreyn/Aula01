@@ -24,7 +24,7 @@ var saude = 100;
 var saudeMenos = 1;
 var barraSaudeLarg = 60;
 
-// racket settings
+//definições de racket 
 var corRacket;
 var racketLargur = 100;
 var racketAltur = 10;
@@ -38,7 +38,7 @@ var altMin = 200;
 var altMax = 300;
 var lagParede = 80;
 var corParede;
-var paredes = [];
+var paredes = []; 
 
 /********* BLOCO SETUP  *********/
 
@@ -155,6 +155,7 @@ function desRacket() {
   rect(mouseX, mouseY, racketLargur, racketAltur, 5);
 }
 
+//gera valores para parede e armazena em uma string
 function maisParede() {
   if (millis()- ultTemp > inteParede) {
     var randHeight = round(random(altMin, altMax));
@@ -171,9 +172,12 @@ function paredeHandler() {
     paredeMover(i);
     desParede(i);
     colisao(i);
+	//watchWallCollision(i);
    
   }
 }
+
+//Desenha a parede
 function desParede(index) {
   var parede = paredes[index];
   // pega os valores da parede 
@@ -193,12 +197,6 @@ function paredeMover(index) {
   var parede = paredes[index];
   parede[0] -= velParede;
 }
-function paredeRemover(index) {
-  var parede = paredes[index];
-  if (parede[0]+parede[2] <= 0) {
-    paredes.splice(index, 1);
-  }
-}
 
 function paredeRemover(index) {
   var parede = paredes[index];
@@ -208,10 +206,9 @@ function paredeRemover(index) {
 }
 
 //Colisao
-
 function colisao(index) {
   var parede = paredes[index];
-  // get gap parede settings 
+  // Carrega as definições de parede   
   var gapParedeX = parede[0];
   var gapParedeY = parede[1];
   var gapParedeLargura = parede[2];
@@ -219,28 +216,28 @@ function colisao(index) {
   var paredePontos = parede[4];
   var paredeTopX = gapParedeX;
   var paredeTopY = 0;
-  var paredeTopWidth = gapParedeLargura;
-  var paredeTopHeight = gapParedeX;
-  var paredeBottomX = gapParedeX;
-  var paredeBottomY = gapParedeX+gapParedeAltura;
-  var paredeBottomWidth = gapParedeLargura;
-  var paredeBottomHeight = height-(gapParedeY+gapParedeAltura);
+  var paredeTopLargura = gapParedeLargura;
+  var paredeTopAltura = gapParedeY;
+  var paredeBaixoX = gapParedeX;
+  var paredeBaixoY = gapParedeY+gapParedeAltura;
+  var paredeBaixoLargura = gapParedeLargura;
+  var paredeBaixoAltura = height - (gapParedeY+gapParedeAltura);
 
   if (
     ( bolX+(tamBol/2)>paredeTopX) &&
-    ( bolX-(tamBol/2)<paredeTopX+paredeTopWidth) &&
+    ( bolX-(tamBol/2)<paredeTopX+paredeTopLargura) &&
     ( bolY+(tamBol/2)>paredeTopY) &&
-    ( bolY-(tamBol/2)<paredeTopY+paredeTopHeight)
+    ( bolY-(tamBol/2)<paredeTopY+paredeTopAltura)
     ) {
     menosSaud();
   }
   if (
-    ( bolX+( tamBol/2)>paredeBottomX) &&
-    ( bolX-( tamBol/2)<paredeBottomX+paredeBottomWidth) &&
-    ( bolY+( tamBol/2)>paredeBottomY) &&
-    ( bolY-( tamBol/2)<paredeBottomY+paredeBottomHeight)
+    ( bolX+( tamBol/2)>paredeBaixoX) &&
+    ( bolX-( tamBol/2)<paredeBaixoX+paredeBaixoLargura) &&
+    ( bolY+( tamBol/2)>paredeBaixoY) &&
+    ( bolY-( tamBol/2)<paredeBaixoY+paredeBaixoAltura)
     ) {
-    menosSaud();
+   menosSaud();
   }
 
   if ( bolX > gapParedeX+(gapParedeLargura/2) && paredePontos==0) {
@@ -248,7 +245,7 @@ function colisao(index) {
     parede[4]=1; // impedir q seja marcado pontos + de 1 vez
     maisPonto();
   }
-}
+} 
 
 function desBarraSaud() {
   noStroke();
