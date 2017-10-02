@@ -315,7 +315,7 @@ function desBarraSaud() {
 }
 
 function menosSaud() {
-  //saude -= saudeMenos;
+  saude -= saudeMenos;
   if (saude <= 0) {
     gameOver();
   }
