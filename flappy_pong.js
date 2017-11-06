@@ -100,6 +100,7 @@ function gameplayScreen() {
   maisParede();
   paredeHandler();
   novoNivel();
+  geraItem()
   
 }
 function gameOverScreen() {
@@ -214,6 +215,23 @@ function paredeRemover(index) {
   }
 }
 
+function geraItem(){
+	if(itenX<=witdh){
+        ellipse(itenX, ItenY, 
+		
+
+}
+
+function verifItem() {
+	if (millis() - ultIntev > intevItem){
+		itenX = widht 
+		ultIntev = millis();
+	}
+	if (!(millis() - ultIntev > intevItem)){
+		return false;
+
+}
+}
 //Colisao
 
 function colisao(index) {
@@ -273,7 +291,6 @@ function colisao(index) {
   var wallBottomY = gapWallY+gapWallHeight;
   var wallBottomWidth = gapWallWidth;
   var wallBottomHeight = height-(gapWallY+gapWallHeight);
-
   if (
     (bolX+(tamBol/2)>wallTopX) &&
     (bolX-(tamBol/2)<wallTopX+wallTopWidth) &&
@@ -290,7 +307,6 @@ function colisao(index) {
     ) {
     menosSaud();
   } 
-
   if (bolX > gapWallX+(gapWallWidth/2) && wallScored==0) {
     wallScored=1;
     parede[4]=1;
@@ -394,6 +410,7 @@ function fazerQuicarChao(superfi) {
 // bola sobe e bate no teto
 function fazerQuicarTeto(superfi) {
   bolY = superfi + (tamBol/2);
+  for(
   vertBolVel*=-1;
   vertBolVel -= (vertBolVel*friccao);
 }
@@ -428,3 +445,4 @@ function manterEmTela() {
     fazerQuicarDir(width);
   }
 }
+
