@@ -11,12 +11,12 @@ var gravidade = 0.3;
 var artrito = 0.00001;
 var friccao = 0.1;
 
-var intevItem = 10000; 
+var intevItem = 5000; 
 var ultIntev = 0;
 var tamIten = 10;
-var itenX = -20;
-var itenY = 0;
-
+var itenX = 900;
+var itenY = 70;
+var velIten = 6;
 
 var bolX, bolY;
 var corBol;
@@ -226,18 +226,20 @@ function paredeRemover(index) {
 }
 
 function geraItem(){
-	if(itenX<=width && (itenX+(tamIten/2)) > 0){
+	if(itenX<=width && (itenX+(tamIten)) > 0){
 		fill(138,0,103);
         ellipse(itenX, itenY, tamIten, tamIten);
-		itenX -= velParede;
-		/*if ((dist(bolX,bolY,itenX,itenY)) <= ((tamBol/2)+(tamIten/2) || ((itenX+(tamIten/2) > mouseX-(racketLargur/2)) && (itenX-(tamIten/2) < mouseX+(racketLargur/2))) {
-			if (dist(itenX, itenY, itenX, mouseY)<=(tamBol/2)){
-			vida+=10;
-			itenX=0;
-		}*/
+		itenX -= velIten;
+			  /* if (((itenX+(tamIten/2) > mouseX-(racketLargur/2)) && (itenX-(tamIten/2) < mouseX+(racketLargur/2)))){
+				  if(dist(itenX, itenY, itenX, mouseY)<=(tamIten/2)) {
+					 vida= vida - 10;
+					 itenX=900;
+				 } */
+			
+		}  
 	}
-	else if((itenX+(tamIten/2)) < 0){
-		itenY = round(random(15, height-50));
+	else if((itenX+(tamIten)) < 0  || itenX>width){
+		//itenY = round(random(parede[1], parede[1]+parede[3]));
 	} 
 	}
 
