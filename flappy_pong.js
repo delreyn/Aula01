@@ -4,6 +4,8 @@
 // 0: Tela Inicial 
 // 1: Tela d Jogo
 // 2: Tela de Game-over 
+var ativAnim = false;
+var count =0;
 
 var gameScreen = 0;
 
@@ -50,7 +52,7 @@ var paredes = [];
 //objetos
 
 //intObj = 25000;
-var jaFoi = [0,0,0,0];
+var jaFoi = [0,0,0,0,0];
 
 /********* BLOCO SETUP  *********/
 
@@ -158,7 +160,11 @@ function restart() {
   gameScreen = 1;
   corParede = color(44, 62, 80);
   velParede = 4;
-  
+  lagParede = 80;
+  for(var i=0; i<6; i++){
+	  jaFoi[i]=0;
+  }
+  inteParede = 1000;
 }
 
 //Desenha a bola
@@ -226,20 +232,21 @@ function paredeRemover(index) {
 }
 
 function geraItem(){
+	fill(138,0,103);
 	if(itenX<=width && (itenX+(tamIten)) > 0){
-		fill(138,0,103);
-        ellipse(itenX, itenY, tamIten, tamIten);
+		ellipse(itenX, itenY, tamIten, tamIten);
 		itenX -= velIten;
-			  /* if (((itenX+(tamIten/2) > mouseX-(racketLargur/2)) && (itenX-(tamIten/2) < mouseX+(racketLargur/2)))){
+				if (((itenX+(tamIten/2) > mouseX-(racketLargur/2)) && (itenX-(tamIten/2) < mouseX+(racketLargur/2)))){
 				  if(dist(itenX, itenY, itenX, mouseY)<=(tamIten/2)) {
-					 vida= vida - 10;
+					 saude +=  60;
 					 itenX=900;
-				 } */
-			
-		}  
+				
+				 }
+			//console.log(dist(itenX, itenY, itenX, mouseY)<=(tamIten/2));
+		}   
 	}
 	else if((itenX+(tamIten)) < 0  || itenX>width){
-		//itenY = round(random(parede[1], parede[1]+parede[3]));
+		itenY = round(random(15, height-10));
 	} 
 	}
 
@@ -309,7 +316,7 @@ function desBarraSaud() {
 }
 
 function menosSaud() {
-  //saude -= saudeMenos;
+  saude -= saudeMenos;
   if (saude <= 0) {
     gameOver();
   }
@@ -341,32 +348,55 @@ function verQuicaRacket() {
   }
 }
 
+
 function novoNivel() {
 	if (pontos > 10 && pontos < 20 && jaFoi[0]==0){
 	corParede = color(6, 189, 24);
-	velParede++;
+	velParede += 3;
 	//saude += 50;
 	jaFoi[0]=1;
+	inteParede = round(inteParede*(4/5));
+	lagParede -= 5;
 	}
 	if ( pontos > 20 && pontos < 30 && jaFoi[1]==0){
-	corParede = color(227, 5, 142);
-	velParede++;
+	corParede = color(	1, 191, 134);
+	velParede -= 3;
 	//saude += 50;
 	jaFoi[1]=1;
+	inteParede = round(inteParede*(3/5));
+	lagParede -= 5;
+	
 	}
 	if ( pontos > 30 && pontos < 40 && jaFoi[2]==0){
-	corParede = color(207, 230, 0);
+	corParede = color(79, 28, 0);
 	velParede++;
 	//saude += 50;
 	jaFoi[2]=1;
+	lagParede += 5;
 	}
 	if ( pontos > 40 && pontos < 50 && jaFoi[3]==0){
-	corParede = color(237, 0, 4);
-	velParede++;
+	corParede = color(255, 153, 0);
+	velParede -= 2;
 	//saude += 50;
 	jaFoi[3]=1;
+	inteParede = round(inteParede*(3/5));
+	lagParede += 5;
+	}
+	if ( pontos > 50 && pontos < 60 && jaFoi[4]==0){
+	corParede = color(255, 89, 89);
+	velParede += 5;
+	saude += 50;
+	jaFoi[4]=1;
+	inteParede = round(inteParede*(3/5));
+	lagParede += 5;
 	}
 	
+}
+
+function maisDifi(){
+	if (jaFoi[0] == 1){
+	    
+	}
 }
 
 //Aplica gravidade
@@ -406,9 +436,21 @@ function fazerQuicarDir(superfi) {
 // manter a bola na tela
 function manterEmTela() {
   // bola bate no chao
-  if (bolY+(tamBol/2) > height) { 
+  if (bolY+(tamBol/2) > height /*&& !ativAnim*/ ) { 
     fazerQuicarChao(height);
+	//ativAnim = true;
+	
   }
+	//fill(corBol);
+	/* if(ativAnim){
+	count+= 0.1;
+		if(count>=15){
+			count=0;
+			ativAnim=false;
+			
+		}
+	animaChao();
+	} */
   // ball hits ceiling
   if (bolY-(tamBol/2) < 0) {
     fazerQuicarTeto(0);
@@ -423,3 +465,10 @@ function manterEmTela() {
   }
 }
 
+function animaChao(count){
+	
+	
+		ellipse(bolX, bolY, tamBol + count, tamBol - count );
+		
+	
+}
