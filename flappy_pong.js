@@ -194,7 +194,7 @@ function restart() {
   }
   inteParede = 1000;
   anima = false;
-  fim = false;
+  ultIntev = 0;
 }
 
 //Desenha a bola
