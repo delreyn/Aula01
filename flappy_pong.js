@@ -267,12 +267,13 @@ function geraItem(){
 		itenX -= velIten;
 				if (((itenX+(tamIten/2) > mouseX-(racketLargur/2)) && (itenX-(tamIten/2) < mouseX+(racketLargur/2)))){
 				  if(dist(itenX, itenY, itenX, mouseY)<=(tamIten/2)) {
-					 if ( (saude + maisSaude) > saudeMax){
-						 saude = saudeMax;
-					 }
-					 else if(saude == saudeMax){
+					 
+					 if(saude == saudeMax){
 						 pontos += bonus;
 						 
+					 }
+					else if ( (saude + maisSaude) > saudeMax){
+						 saude = saudeMax;
 					 }
 					 else if (saude + maisSaude < saudeMax){
 						 saude += maisSaude;
