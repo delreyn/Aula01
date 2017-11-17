@@ -1,10 +1,13 @@
-/********* VARIAVEIS *********/
 
+
+/********* VARIAVEIS *********/
 
 // 0: Tela Inicial 
 // 1: Tela d Jogo
 // 2: Tela de Game-over 
-var ativAnim = false;
+
+var anima = false;
+var fim = false;
 var count =0;
 
 var gameScreen = 0;
@@ -13,18 +16,27 @@ var gravidade = 0.3;
 var artrito = 0.00001;
 var friccao = 0.1;
 
-var intevItem = 5000; 
+var record = 0;
+
+var intevItem = 10000; 
 var ultIntev = 0;
-var tamIten = 10;
+var tamIten = 65;
 var itenX = 900;
 var itenY = 70;
 var velIten = 6;
+var maisSaude = 40;
+var bonus = 4;
 
 var bolX, bolY;
 var corBol;
 var tamBol = 20;
 var vertBolVel = 0;
 var horizBolVel = 0;
+
+var dano;
+var vida;
+var lagImg = 20;
+var altImg = 20;
 
 // Pontos e vida (etapa 4)
 var pontos = 0;
@@ -53,6 +65,13 @@ var paredes = [];
 
 //intObj = 25000;
 var jaFoi = [0,0,0,0,0];
+
+/********** Carrega Imagem *************/
+
+function preload() {
+  dano = loadImage("imagens/skull_sprite.png");
+  vida = loadImage("imagens/heart.png")
+}
 
 /********* BLOCO SETUP  *********/
 
@@ -97,6 +116,8 @@ function initScreen() {
   textSize(15); 
   text("Clique para Jogar", width/2, height-30);
 }
+
+//Tela principal do jogo.
 function gameplayScreen() {
   background(236, 240, 241);
   desBol();
@@ -104,26 +125,33 @@ function gameplayScreen() {
   aplGravidade();
   manterEmTela();
   desBarraSaud();
-  mostraPonto();
   aplVelHoriz();
   verQuicaRacket();
   maisParede();
   paredeHandler();
+  mostraPonto();
   novoNivel();
   verifItem();
   geraItem();
-  
+  mostraRecord();
+  animaDano();
+
 }
+
 function gameOverScreen() {
   background(44, 62, 80);
   textAlign(CENTER);
   fill(236, 240, 241);
-  textSize(12);
+  textSize(15);
   text("Seus pontos:", width/2, height/2 - 120);
   textSize(130);
   text(pontos, width/2, height/2);
+	textSize(12);
+	text("Recorde:", width/2, height/2 + 90);
+	textSize(25); 
+	text(record, width/2, round(height/2) + 115);
   textSize(15);
-  text("Click para recomeçar", width/2, height-30);
+  text("Click para recomeçar", width/2, height - 10);
 }
 
 
@@ -165,6 +193,8 @@ function restart() {
 	  jaFoi[i]=0;
   }
   inteParede = 1000;
+  anima = false;
+  fim = false;
 }
 
 //Desenha a bola
@@ -197,7 +227,6 @@ function paredeHandler() {
     paredeMover(i);
     desParede(i);
     colisao(i);
-	//watchWallCollision(i);
    
   }
 }
@@ -232,17 +261,24 @@ function paredeRemover(index) {
 }
 
 function geraItem(){
-	fill(138,0,103);
 	if(itenX<=width && (itenX+(tamIten)) > 0){
-		ellipse(itenX, itenY, tamIten, tamIten);
+		image(vida,itenX,itenY,tamIten+40,tamIten);
+
 		itenX -= velIten;
 				if (((itenX+(tamIten/2) > mouseX-(racketLargur/2)) && (itenX-(tamIten/2) < mouseX+(racketLargur/2)))){
 				  if(dist(itenX, itenY, itenX, mouseY)<=(tamIten/2)) {
-					 saude +=  60;
+					 if ( (saude + maisSaude) > saudeMax){
+						 saude = saudeMax;
+					 }
+					 else if(saude == saudeMax){
+						 pontos += bonus;
+						 
+					 }
+					 else if (saude + maisSaude < saudeMax){
+						 saude += maisSaude;
+					 }
 					 itenX=900;
-				
-				 }
-			//console.log(dist(itenX, itenY, itenX, mouseY)<=(tamIten/2));
+					 }
 		}   
 	}
 	else if((itenX+(tamIten)) < 0  || itenX>width){
@@ -282,6 +318,8 @@ function colisao(index) {
     ( bolY-(tamBol/2)<paredeTopY+paredeTopAltura)
     ) {
     menosSaud();
+	
+	
   }
   if (
     ( bolX+( tamBol/2)>paredeBaixoX) &&
@@ -290,9 +328,10 @@ function colisao(index) {
     ( bolY-( tamBol/2)<paredeBaixoY+paredeBaixoAltura)
     ) {
    menosSaud();
+  
   }
 
-  if ( bolX > gapParedeX+(gapParedeLargura/2) && paredePontos==0) {
+  if ( bolX > gapParedeX+(gapParedeLargura/2) && paredePontos==0 && anima == false) {
     paredePontos=1;
     parede[4]=1; // impedir q seja marcado pontos + de 1 vez
     maisPonto();
@@ -318,7 +357,8 @@ function desBarraSaud() {
 function menosSaud() {
   saude -= saudeMenos;
   if (saude <= 0) {
-    gameOver();
+    anima = true;
+
   }
 }
 
@@ -330,6 +370,18 @@ function mostraPonto() {
   fill(0);
   textSize(30); 
   text(pontos, height/2, 50);
+}
+
+function mostraRecord(){
+	textAlign(CORNER);
+	if(record === 0){
+		
+	}
+	else {
+		textSize(25);
+		fill(205, 173, 0);
+		text(record, 30, round(height/12) );
+	}
 }
 
 
@@ -350,54 +402,51 @@ function verQuicaRacket() {
 
 
 function novoNivel() {
-	if (pontos > 10 && pontos < 20 && jaFoi[0]==0){
+	if (pontos > 20 && pontos < 30 && jaFoi[0]==0){
 	corParede = color(6, 189, 24);
 	velParede += 3;
 	//saude += 50;
 	jaFoi[0]=1;
 	inteParede = round(inteParede*(4/5));
 	lagParede -= 5;
+	intevItem = 35000;
 	}
-	if ( pontos > 20 && pontos < 30 && jaFoi[1]==0){
+	if ( pontos > 30 && pontos < 40 && jaFoi[1]==0){
 	corParede = color(	1, 191, 134);
 	velParede -= 3;
 	//saude += 50;
 	jaFoi[1]=1;
 	inteParede = round(inteParede*(3/5));
-	lagParede -= 5;
+	lagParede += 5;
 	
 	}
-	if ( pontos > 30 && pontos < 40 && jaFoi[2]==0){
+	if ( pontos > 40 && pontos < 50 && jaFoi[2]==0){
 	corParede = color(79, 28, 0);
 	velParede++;
 	//saude += 50;
 	jaFoi[2]=1;
 	lagParede += 5;
+	intevItem -= 2000;
 	}
-	if ( pontos > 40 && pontos < 50 && jaFoi[3]==0){
+	if ( pontos > 50 && pontos < 60 && jaFoi[3]==0){
 	corParede = color(255, 153, 0);
-	velParede -= 2;
+	velParede += 3;
 	//saude += 50;
 	jaFoi[3]=1;
 	inteParede = round(inteParede*(3/5));
-	lagParede += 5;
+	lagParede += 15;
 	}
-	if ( pontos > 50 && pontos < 60 && jaFoi[4]==0){
+	if ( pontos > 60 && pontos < 70 && jaFoi[4]==0){
 	corParede = color(255, 89, 89);
-	velParede += 5;
-	saude += 50;
+	velParede += 2;
+	//saude += 50;
 	jaFoi[4]=1;
-	inteParede = round(inteParede*(3/5));
+	//inteParede = round(inteParede*(3/5));
 	lagParede += 5;
 	}
-	
 }
 
-function maisDifi(){
-	if (jaFoi[0] == 1){
-	    
-	}
-}
+
 
 //Aplica gravidade
 function aplGravidade() {
@@ -438,37 +487,46 @@ function manterEmTela() {
   // bola bate no chao
   if (bolY+(tamBol/2) > height /*&& !ativAnim*/ ) { 
     fazerQuicarChao(height);
-	//ativAnim = true;
-	
   }
-	//fill(corBol);
-	/* if(ativAnim){
-	count+= 0.1;
-		if(count>=15){
-			count=0;
-			ativAnim=false;
-			
-		}
-	animaChao();
-	} */
-  // ball hits ceiling
+  // bola acerta topo
   if (bolY-(tamBol/2) < 0) {
     fazerQuicarTeto(0);
   }
-  // ball hits left of the screen
+  // bola acerta canto esquerdo da tela
   if (bolX-(tamBol/2) < 0) {
     fazerQuicarEsq(0);
   }
-  // ball hits right of the screen
+  // bola acerta canto esquerdo
   if (bolX+(tamBol/2) > width) {
     fazerQuicarDir(width);
   }
 }
 
-function animaChao(count){
-	
-	
-		ellipse(bolX, bolY, tamBol + count, tamBol - count );
+//gera a animacao da caveira quando o jogador morre.
+
+function animaDano(){
+	if (anima == true){
 		
+		if (count <250 ){
+		imageMode(CENTER);
+		lagImg +=  25; 
+		altImg +=  25;
+		image(dano,width/2,height/2,lagImg,altImg);
+		count += 5;
+	}
 	
+	if (count >= 250){
+			
+			lagImg = tamBol;
+			altImg = tamBol;
+			count =0;
+			if ( pontos >= record){
+				record = pontos;
+	}
+			gameOver();	
+			
+	}
+	
+	}
 }
+
